@@ -48,15 +48,20 @@ class SpringBootCamelRabbitmqBugApplicationTests {
       from("direct:start")
         .routeId("start")
         .log("${body}")
-        .to("direct:finish");
-      from("direct:finish")
-        .routeId("finish")
+        .to("direct:process");
+      from("direct:process")
+        .routeId("process")
         .log("${body}")
         .log("send to invalid rabbitmq exchange")
         .to("spring-rabbitmq:invalidExchange")
         .log("delay 5 seconds to see error message from RabbitTemplate")
         .delay(5000)
-        .log("success")
+        .to("direct:finish")
+      ;
+      from("direct:finish")
+      .routeId("finish")
+      .log("${body}")
+      .log("success")
       ;
       // @formatter:on
       
